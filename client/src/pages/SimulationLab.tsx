@@ -41,8 +41,10 @@ export const SimulationLab: React.FC = () => {
         duration_intervals: duration,
         magnitude: magnitude !== '' ? Number(magnitude) : undefined
       });
-      if (res.success) {
+      if (res && res.success) {
         setSimulationResult(res);
+      } else {
+        alert(`Simulation injection failed: ${res?.message || res?.error || 'Unknown error'}`);
       }
     } catch (err: any) {
       alert(`Simulation injection failed: ${err.message}`);
@@ -56,6 +58,8 @@ export const SimulationLab: React.FC = () => {
     setFaultType('SPIKE');
     setParameter('temperature');
     setSeverity('HIGH');
+    setDuration(4);
+    setMagnitude('');
   };
 
   return (

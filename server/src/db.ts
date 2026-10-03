@@ -41,6 +41,23 @@ export async function initDatabase(): Promise<void> {
 }
 
 /**
+ * Convert PostgreSQL-style $1, $2, ... parameterized SQL to SQLite ? placeholders.
+ * PostgreSQL allows reusing the same $N (e.g. $4 twice), but SQLite ? placeholders
+ * are strictly positional — each ? maps to the next element in the params array.
+ * This function replaces each $N with ? and builds a new params array where
+ * repeated $N references produce duplicate entries at the right positions.
+ */
+function convertPgToSqlite(sql: string, params: any[]): { sql: string; params: any[] } {
+  const sqliteParams: any[] = [];
+  const sqliteSql = sql.replace(/\$(\d+)/g, (_match, numStr) => {
+    const idx = parseInt(numStr, 10) - 1; // $1 → index 0
+    sqliteParams.push(params[idx]);
+    return '?';
+  });
+  return { sql: sqliteSql, params: sqliteParams };
+}
+
+/**
  * Universal query runner: translates postgres $1, $2 to sqlite ? if needed
  */
 export async function query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
@@ -53,11 +70,10 @@ export async function query<T = any>(sql: string, params: any[] = []): Promise<T
     throw new Error('Database not initialized');
   }
 
-  // Convert $1, $2, ... to ? for SQLite
-  let sqliteSql = sql.replace(/\$(\d+)/g, '?');
+  const converted = convertPgToSqlite(sql, params);
 
   return new Promise((resolve, reject) => {
-    sqliteDb!.all(sqliteSql, params, (err, rows) => {
+    sqliteDb!.all(converted.sql, converted.params, (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -81,10 +97,10 @@ export async function execute(sql: string, params: any[] = []): Promise<any> {
     throw new Error('Database not initialized');
   }
 
-  let sqliteSql = sql.replace(/\$(\d+)/g, '?');
+  const converted = convertPgToSqlite(sql, params);
 
   return new Promise((resolve, reject) => {
-    sqliteDb!.run(sqliteSql, params, function (err) {
+    sqliteDb!.run(converted.sql, converted.params, function (err) {
       if (err) {
         reject(err);
       } else {
