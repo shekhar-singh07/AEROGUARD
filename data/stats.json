@@ -1,0 +1,15 @@
+{
+  "total_stations": 1248,
+  "online_stations": 1173,
+  "offline_stations": 75,
+  "warning_stations": 86,
+  "critical_stations": 45,
+  "observations_processed": 118983,
+  "active_anomalies": 25,
+  "critical_alerts": 11,
+  "average_trust_score": 95.24,
+  "sensors_requiring_attention": 100,
+  "cadence_minutes": 15,
+  "days": 7,
+  "generated_at": "2026-10-03 03:00:00"
+}

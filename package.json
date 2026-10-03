@@ -1,0 +1,23 @@
+{
+  "name": "aeroguard",
+  "version": "1.0.0",
+  "description": "AEROGUARD: AI-Powered AWS Observation Quality & Sensor Intelligence Platform (SIH26073)",
+  "scripts": {
+    "data:generate": "python data/generate.py --days 7",
+    "data:load": "python data/loader.py",
+    "ml:start": "python -m uvicorn ml.app.main:app --host 127.0.0.1 --port 8000",
+    "server:dev": "npm --prefix server run dev",
+    "client:dev": "npm --prefix client run dev",
+    "start": "node scripts/start_all.js"
+  },
+  "keywords": [
+    "sih26073",
+    "weather",
+    "anomaly-detection",
+    "aws",
+    "isolation-forest",
+    "meteorology"
+  ],
+  "author": "AEROGUARD Team",
+  "license": "MIT"
+}
